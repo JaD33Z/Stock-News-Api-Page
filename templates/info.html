@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+{% include "header.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block content %}
+
+
+
+<div class="jumbotron" >
+    <div class="row text-center">
+
+    <h1>Usage Info Page</h1>
+        <br>
+            </div>
+</div>
+ <br>
+
+<div class="container">
+        <div class="row text-center">
+  <p> <h4>Welcome! With this app you can view your chosen company's
+      percentage difference regarding it's rise/drop in closing price for the last two days.
+        It will also retrieve recent news briefs and links to the articles involving the company
+        of interest. Just enter the ticker symbol and company name in the form on the home page.
+        These symbols are very specific and they must be entered correctly before submitting.
+        For instance, Apple is AAPL, Tesla is TSLA, Microsoft Corporation is MSFT, and so on.
+        Give those examples a try to see the results. There is also a link in the NavBar's Dropdown Menu
+        for a company-name-to-symbol search engine website for reference.</h4></p>
+
+            </div>
+</div>
+
+{% endblock %}

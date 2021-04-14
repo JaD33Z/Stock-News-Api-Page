@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% include "header.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="jumbotron" >
+    <div class="row text-center">
+
+    <h1>Stock Market News</h1>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+
+      <div class="col-lg-8 col-md-10 mx-auto content">
+         {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+           <p>{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+
+        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+      </div>
+    </div>
+  </div>
+<br>
+<br>
+
+<div class="container">
+    {% if form.submit %}
+    {% for article in articles %}
+        {{ article }}
+    <br>
+    <br>
+    {% endfor %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+
+
+
