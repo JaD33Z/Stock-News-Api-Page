@@ -24,45 +24,49 @@ class StockChoice(FlaskForm):
     company_name = StringField("Name of Company", validators=[DataRequired()])
     submit = SubmitField("Check recent Activity")
 
-
 @app.route('/', methods=["GET", "POST"])
 def home():
     form = StockChoice()
     if form.validate_on_submit():
         STOCK_NAME = request.form['stock_name']
         COMPANY_NAME = request.form['company_name']
+
         stock_params = {
             "function": "TIME_SERIES_DAILY",
             "symbol": STOCK_NAME,
             "bestMatches": STOCK_NAME,
             "apikey": STOCK_API_KEY,
         }
+
+        news_params = {
+            "q": COMPANY_NAME,
+            "apiKey": NEWS_API_KEY,
+        }
+        news_data = requests.get(NEWS_ENDPOINT, params=news_params)
+        news_articles = news_data.json()["articles"]
+        recent_articles = news_articles[:3]
         response = requests.get(url=STOCK_ENDPOINT, params=stock_params)
         data_daily = response.json()["Time Series (Daily)"]
         data_list = [value for (key, value) in data_daily.items()]
         yesterday_close = data_list[0]["4. close"]
         day_before_close = data_list[1]["4. close"]
-        up_down = None
         pos_diff = (float(yesterday_close) - float(day_before_close))
         if pos_diff > 0:
             up_down = "🔺"
         else:
             up_down = "🔻"
         percentage_diff = round((pos_diff / float(yesterday_close)) * 100)
+        percent_value = abs(percentage_diff)
 
-        if abs(percentage_diff):
-            news_params = {
-                "q": COMPANY_NAME,
-                "apiKey": NEWS_API_KEY,
-            }
-            news_data = requests.get(url=NEWS_ENDPOINT, params=news_params)
-            news_articles = news_data.json()["articles"]
+        if not percent_value:
+            flash(f'No percentage changes for {STOCK_NAME} today.')
+            return redirect(url_for('home'))
 
-            recent_articles = news_articles[:3]
-            if len(recent_articles) < 3:
-                flash('No results found.')
-                return redirect(url_for('home'))
+        if len(recent_articles) < 3:
+            flash('No results found.')
+            return redirect(url_for('home'))
 
+        else:
             first_3_articles = [
                 f"{STOCK_NAME} {up_down} %{percentage_diff} \nHeadline: {article['title']}. \nBrief: {article['description']}. \nUrl: {article['url']} "
                 for article in recent_articles]
@@ -70,6 +74,7 @@ def home():
             return render_template('index.html', form=form, articles=first_3_articles)
 
     return render_template('index.html', form=form)
+
 
 
 @app.route('/info')
